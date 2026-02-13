@@ -172,14 +172,28 @@ function dodge(){
   const maxX = cardRect.width - btnRect.width;
   const maxY = cardRect.height - btnRect.height;
 
-  // Generate completely new random position inside card
-  const newX = Math.random() * maxX;
-  const newY = Math.random() * maxY;
+  const MIN_JUMP_DISTANCE = 180; // 👈 increase for farther jumps
+
+  let newX, newY;
+  let distance = 0;
+
+  const currentX = parseFloat(noBtn.style.left) || 0;
+  const currentY = parseFloat(noBtn.style.top) || 0;
+
+  // Keep generating until it's far enough
+  do {
+    newX = Math.random() * maxX;
+    newY = Math.random() * maxY;
+
+    distance = Math.hypot(newX - currentX, newY - currentY);
+
+  } while (distance < MIN_JUMP_DISTANCE);
 
   noBtn.style.position = "absolute";
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
 }
+
 
 
 /* Trigger dodge */
