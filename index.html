@@ -191,6 +191,12 @@ noBtn.addEventListener("touchstart",(e)=>{
   dodge();
 });
 
+
+noBtn.addEventListener("touchmove",(e)=>{
+  e.preventDefault();
+  dodge();
+});
+
 /* Block click */
 noBtn.addEventListener("click",(e)=>{
   e.preventDefault();
