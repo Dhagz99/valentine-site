@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Be My Valentine?</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 
 body{
   min-height:100vh;
@@ -25,14 +20,13 @@ body{
   position:relative;
 }
 
-/* Floating Hearts */
+/* Floating hearts */
 .heart{
   position:absolute;
   bottom:-20px;
   animation:floatUp linear infinite;
   opacity:0.6;
 }
-
 @keyframes floatUp{
   0%{transform:translateY(0) scale(1);opacity:0.6;}
   100%{transform:translateY(-110vh) scale(1.5);opacity:0;}
@@ -47,23 +41,12 @@ body{
   border-radius:25px;
   text-align:center;
   backdrop-filter:blur(15px);
-  background:rgba(255,255,255,0.15);
-  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  background:rgba(255,255,255,0.18);
+  box-shadow:0 20px 40px rgba(0,0,0,0.25);
   color:white;
+  transition:0.5s ease;
 }
 
-.card h1{
-  font-size:24px;
-  margin-bottom:10px;
-}
-
-.card p{
-  font-size:14px;
-  opacity:0.9;
-  margin-bottom:30px;
-}
-
-/* Buttons */
 .btn-group{
   display:flex;
   justify-content:center;
@@ -78,62 +61,81 @@ body{
   font-size:15px;
   font-weight:600;
   cursor:pointer;
-  transition:all 0.3s ease;
+  transition:0.3s ease;
 }
 
-/* YES button */
 #yesBtn{
   background:white;
   color:#ff4d6d;
   box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
+#yesBtn:hover{transform:scale(1.1);}
 
-#yesBtn:hover{
-  transform:scale(1.1);
-  box-shadow:0 10px 25px rgba(255,255,255,0.6);
-}
-
-/* NO button */
 #noBtn{
   background:rgba(255,255,255,0.3);
   color:white;
-  position:absolute;
-  transition:transform 0.35s cubic-bezier(.25,.8,.25,1);
-  animation:pulse 1.5s infinite;
+  position:relative; /* important fix */
 }
 
-/* Pulse animation */
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,255,255,0.6);}
-  70%{box-shadow:0 0 0 15px rgba(255,255,255,0);}
-  100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
+/* Cinematic Romantic Mode */
+.cinematic{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  background:radial-gradient(circle at center,#ff4d6d,#1a001a);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:999;
+  animation:fadeIn 1s ease forwards;
+  overflow:hidden;
 }
 
-/* Success */
-.success{
+/* Glowing romantic image */
+.love-image{
+  width:90%;
+  max-width:360px;
+  border-radius:25px;
+  border:5px solid white;
+  box-shadow:
+    0 0 20px rgba(255,0,100,0.8),
+    0 0 60px rgba(255,0,100,0.6);
+  animation:zoomIn 1.5s ease forwards, pulseGlow 2s infinite;
+}
+
+/* Romantic message */
+.typewriter{
+  color:white;
+  margin-top:25px;
   font-size:22px;
-  font-weight:700;
-  margin-top:20px;
-  animation:pop 0.5s ease forwards;
+  text-align:center;
+  width:85%;
+  max-width:420px;
+  line-height:1.6;
+  text-shadow:0 0 10px rgba(255,0,120,0.8);
 }
 
-@keyframes pop{
-  0%{transform:scale(0.5);opacity:0;}
-  100%{transform:scale(1);opacity:1;}
+/* Animations */
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes zoomIn{from{transform:scale(0.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes pulseGlow{
+  0%{box-shadow:0 0 20px rgba(255,0,100,0.8);}
+  50%{box-shadow:0 0 60px rgba(255,0,100,1);}
+  100%{box-shadow:0 0 20px rgba(255,0,100,0.8);}
 }
 
-/* Mobile */
-@media(max-width:480px){
-  .btn-group{
-    flex-direction:column;
-    align-items:center;
-  }
-  .btn{
-    width:100%;
-  }
-  .card h1{
-    font-size:20px;
-  }
+/* Confetti */
+.confetti{
+  position:fixed;
+  width:10px;
+  height:10px;
+  top:-10px;
+  animation:fall 3s linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(100vh) rotate(720deg);}
 }
 </style>
 </head>
@@ -148,79 +150,77 @@ body{
     <button id="yesBtn" class="btn">Yes 💘</button>
     <button id="noBtn" class="btn">No 💔</button>
   </div>
-
-  <div id="response"></div>
 </div>
+
+<audio id="bgMusic" src="music.mp3" loop></audio>
 
 <script>
 const noBtn=document.getElementById("noBtn");
 const yesBtn=document.getElementById("yesBtn");
 const card=document.querySelector(".card");
-const response=document.getElementById("response");
+const music=document.getElementById("bgMusic");
 
-let posX=0;
-let posY=0;
+const DEFAULT_NAME="Mylabs";
 
-/* Start beside Yes */
-noBtn.style.position="relative";
-noBtn.style.transform="translate(0,0)";
-
+/* Dodge logic */
 function dodge(){
-  const cardRect = card.getBoundingClientRect();
-  const btnRect = noBtn.getBoundingClientRect();
+  const rect=card.getBoundingClientRect();
+  const btnRect=noBtn.getBoundingClientRect();
+  const maxX=rect.width-btnRect.width;
+  const maxY=rect.height-btnRect.height;
 
-  const maxX = cardRect.width - btnRect.width;
-  const maxY = cardRect.height - btnRect.height;
+  noBtn.style.position="absolute";
+  noBtn.style.left=Math.random()*maxX+"px";
+  noBtn.style.top=Math.random()*maxY+"px";
+}
+noBtn.addEventListener("mouseenter",dodge);
+noBtn.addEventListener("touchstart",(e)=>{e.preventDefault();dodge();});
 
-  const MIN_JUMP_DISTANCE = 180; // 👈 increase for farther jumps
+/* YES CLICK */
+yesBtn.addEventListener("click",()=>{
 
-  let newX, newY;
-  let distance = 0;
+  music.play();
 
-  const currentX = parseFloat(noBtn.style.left) || 0;
-  const currentY = parseFloat(noBtn.style.top) || 0;
+  document.body.innerHTML=`
+    <div class="cinematic">
+      <img src="image.jpeg" class="love-image">
+      <div class="typewriter" id="message"></div>
+    </div>
+  `;
 
-  // Keep generating until it's far enough
-  do {
-    newX = Math.random() * maxX;
-    newY = Math.random() * maxY;
+  startConfetti();
+  typeMessage(DEFAULT_NAME);
+});
 
-    distance = Math.hypot(newX - currentX, newY - currentY);
+/* Typewriter */
+function typeMessage(name){
+  const text=`${name}, you are my forever Valentine. ❤️
+Every moment with you feels like a dream.
+I love you endlessly and always will. 💖`;
 
-  } while (distance < MIN_JUMP_DISTANCE);
-
-  noBtn.style.position = "absolute";
-  noBtn.style.left = newX + "px";
-  noBtn.style.top = newY + "px";
+  const msg=document.getElementById("message");
+  let i=0;
+  function type(){
+    if(i<text.length){
+      msg.innerHTML+=text.charAt(i);
+      i++;
+      setTimeout(type,40);
+    }
+  }
+  type();
 }
 
-
-
-/* Trigger dodge */
-noBtn.addEventListener("mouseenter",dodge);
-noBtn.addEventListener("mousedown",dodge);
-
-noBtn.addEventListener("touchstart",(e)=>{
-  e.preventDefault();
-  dodge();
-});
-
-
-noBtn.addEventListener("touchmove",(e)=>{
-  e.preventDefault();
-  dodge();
-});
-
-/* Block click */
-noBtn.addEventListener("click",(e)=>{
-  e.preventDefault();
-  e.stopPropagation();
-});
-
-/* Yes click */
-yesBtn.addEventListener("click",()=>{
-  response.innerHTML="<div class='success'>Yay! ❤️ Happy Valentine's Day!</div>";
-});
+/* Confetti */
+function startConfetti(){
+  for(let i=0;i<120;i++){
+    const conf=document.createElement("div");
+    conf.classList.add("confetti");
+    conf.style.left=Math.random()*100+"vw";
+    conf.style.background=`hsl(${Math.random()*360},100%,70%)`;
+    conf.style.animationDuration=2+Math.random()*3+"s";
+    document.body.appendChild(conf);
+  }
+}
 
 /* Floating hearts */
 function createHeart(){
